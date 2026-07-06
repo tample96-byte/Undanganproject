@@ -1,7 +1,7 @@
 import { InvitationConfig } from './types';
 
 export const INITIAL_CONFIG: InvitationConfig = {
-  coupleNameShort: "Rian & Salsa",
+  coupleNameShort: "Dayat & Uswah",
   backgroundImageUrl: "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop", // Elegant, beautiful wedding flower background
   weddingDate: "2026-07-12T09:00:00",
   weddingTime: "Minggu, 12 Juli 2026 pukul 09:00 WIB - Selesai",

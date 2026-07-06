@@ -30,7 +30,13 @@ export default function App() {
     const savedConfig = localStorage.getItem('wedding_invitation_config');
     if (savedConfig) {
       try {
-        setConfig(JSON.parse(savedConfig));
+        const parsed = JSON.parse(savedConfig);
+        // Otomatis ubah Rian & Salsa ke Dayat & Uswah jika pengguna masih menyimpan cache lama
+        if (parsed && parsed.coupleNameShort === "Rian & Salsa") {
+          parsed.coupleNameShort = "Dayat & Uswah";
+          localStorage.setItem('wedding_invitation_config', JSON.stringify(parsed));
+        }
+        setConfig(parsed);
       } catch (e) {
         console.error("Failed to parse saved config:", e);
       }

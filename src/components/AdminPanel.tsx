@@ -224,7 +224,7 @@ export default function AdminPanel({
                           value={localConfig.coupleNameShort}
                           onChange={(e) => handleConfigChange('coupleNameShort', e.target.value)}
                           className="w-full bg-white border border-gold-200/40 rounded-lg px-3 py-2 focus:outline-hidden focus:border-gold-500 text-base md:text-sm"
-                          placeholder="e.g. Rian & Salsa"
+                          placeholder="e.g. Dayat & Uswah"
                         />
                       </div>
                     </div>
