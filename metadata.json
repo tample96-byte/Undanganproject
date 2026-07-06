@@ -1,0 +1,6 @@
+{
+  "name": "Undangan Pernikahan Digital",
+  "description": "Sebuah undangan pernikahan digital satu halaman yang elegan, minimalis, dan responsif. Dilengkapi dengan hitung mundur (countdown), galeri, rincian acara, peta lokasi, buku tamu, dan RSVP interaktif.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
