@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowUp, Heart } from 'lucide-react';
+import { ArrowUp, Heart, Music, Play, Pause } from 'lucide-react';
 
 import { InvitationConfig } from './types';
 import { INITIAL_CONFIG } from './initialConfig';
 import Envelope from './components/Envelope';
 import Hero from './components/Hero';
+import QuranVerse from './components/QuranVerse';
 import Events from './components/Events';
+import Gallery from './components/Gallery';
+import TurutMengundang from './components/TurutMengundang';
 import AdminPanel from './components/AdminPanel';
 
 export default function App() {
@@ -14,6 +17,10 @@ export default function App() {
   const [isOpened, setIsOpened] = useState(false);
   const [guestName, setGuestName] = useState('');
   const [showBackToTop, setShowBackToTop] = useState(false);
+
+  // Background Music States & Ref
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Load custom configuration from URL and LocalStorage
   useEffect(() => {
@@ -51,6 +58,20 @@ export default function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Sync Audio source when config.musicUrl changes
+  useEffect(() => {
+    if (audioRef.current) {
+      const wasPlaying = isPlaying;
+      audioRef.current.src = config.musicUrl || '';
+      audioRef.current.load();
+      if (wasPlaying && isOpened) {
+        audioRef.current.play()
+          .then(() => setIsPlaying(true))
+          .catch(e => console.log("Audio play failed on source change:", e));
+      }
+    }
+  }, [config.musicUrl]);
+
   // Update configuration & save to LocalStorage
   const handleUpdateConfig = (newConfig: InvitationConfig) => {
     setConfig(newConfig);
@@ -61,6 +82,10 @@ export default function App() {
   const handleResetConfig = () => {
     setConfig(INITIAL_CONFIG);
     localStorage.removeItem('wedding_invitation_config');
+    if (audioRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
   };
 
   // Open the invitation (guest clicked the envelope button)
@@ -68,6 +93,29 @@ export default function App() {
     setIsOpened(true);
     // Smooth scroll page back to top if not already there
     window.scrollTo({ top: 0 });
+    
+    // Play audio once user interacts with "Buka Undangan"
+    if (audioRef.current) {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch(e => {
+          console.log("Audio play failed on open:", e);
+          setIsPlaying(false);
+        });
+    }
+  };
+
+  // Toggle Play/Pause background music
+  const togglePlayMusic = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch(e => console.log("Audio play failed on toggle:", e));
+    }
   };
 
   const scrollToTop = () => {
@@ -89,6 +137,9 @@ export default function App() {
   return (
     <div className="relative min-h-screen bg-cream-50 font-sans selection:bg-gold-200 selection:text-gold-800">
       
+      {/* Hidden Audio Tag */}
+      <audio ref={audioRef} loop className="hidden" />
+
       {/* 1. Envelope Cover Layer */}
       <AnimatePresence>
         {!isOpened && (
@@ -106,8 +157,17 @@ export default function App() {
         {/* Hero & Countdown Banner */}
         <Hero config={config} guestName={guestName} />
 
+        {/* Elegant Quranic Marriage Verse Section */}
+        <QuranVerse config={config} />
+
         {/* Schedule & Interactive Maps */}
         <Events config={config} />
+
+        {/* Elegant Photo Gallery */}
+        <Gallery images={config.galleryImages} />
+
+        {/* Custom "Turut Mengundang" List Section */}
+        <TurutMengundang config={config} />
 
         {/* Elegant Footer Quote & Credits */}
         <footer className="relative py-16 px-6 bg-charcoal-900 text-cream-100 text-center overflow-hidden">
@@ -146,6 +206,41 @@ export default function App() {
           onUpdateConfig={handleUpdateConfig}
           onResetConfig={handleResetConfig}
         />
+
+        {/* Floating Music Control Button (Bottom-Left) */}
+        <AnimatePresence>
+          {isOpened && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="fixed bottom-6 left-6 z-40"
+            >
+              <button
+                onClick={togglePlayMusic}
+                className="cursor-pointer bg-white text-gold-600 border border-gold-300 w-12 h-12 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl active:scale-95 transition-all duration-300 relative group"
+                title={isPlaying ? "Pause Musik" : "Putar Musik"}
+                id="btn-music-toggle"
+              >
+                {/* Rotating disk boundary */}
+                <div className={`absolute inset-0.5 rounded-full border border-dashed border-gold-400/50 ${isPlaying ? 'animate-spin-slow' : ''}`} />
+                {isPlaying ? (
+                  <Pause className="w-4 h-4 text-gold-600 z-10" />
+                ) : (
+                  <Play className="w-4 h-4 text-gold-600 z-10 translate-x-0.5" />
+                )}
+                
+                {/* Ping wave indicator */}
+                {isPlaying && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-gold-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-gold-500"></span>
+                  </span>
+                )}
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Floating Back-To-Top Button */}
         <AnimatePresence>

@@ -7,4 +7,8 @@ export interface InvitationConfig {
   address: string; // e.g. "Jl. Jenderal Sudirman No. 123"
   mapEmbedUrl: string; // Google Maps embed URL (iframe src)
   googleFormRsvpUrl: string; // Google Form URL for RSVP
+  musicUrl: string; // Background music MP3 url
+  galleryImages: string[]; // List of gallery image URLs
+  islamicVerseText?: string; // Quranic wedding verse (e.g. Ar-Rum Ayat 21)
+  turutMengundang?: string; // People/families who are inviting ("Turut Mengundang")
 }
